@@ -1,0 +1,43 @@
+# This config file is used by ros2_control
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    my_group_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    gripper_controller:  # 新的控制器，用于控制 joint7 和 joint8
+      type: joint_trajectory_controller/JointTrajectoryController
+      
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+my_group_controller:
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+gripper_controller:
+  ros__parameters:
+    joints:
+      - joint7
+      - joint8
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    pid:
+      p: 10.0
+      i: 0.0
+      d: 1.0
