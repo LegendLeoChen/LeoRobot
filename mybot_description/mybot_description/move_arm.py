@@ -7,13 +7,12 @@ from std_msgs.msg import String
 class ArmController(Node):
     def __init__(self):
         super().__init__('arm_controller')
-        self.target_subscription = self.create_subscription(            # 导航节点的控制命令
+        self.target_subscription = self.create_subscription(
             String,
             '/navigate_over',
             self.play,
             30
         )
-        self.publisher_nav = self.create_publisher(String, 'action_over', 10)        # 告知导航节点动作完成的话题
         self.publisher = self.create_publisher(JointTrajectory, '/my_group_controller/joint_trajectory', 10)        # 机械臂动作组
         self.publisher2 = self.create_publisher(JointTrajectory, '/gripper_controller/joint_trajectory', 10)        # 机械爪动作组
         self.send_claw_trajectory([0.6, -0.6])
@@ -22,22 +21,13 @@ class ArmController(Node):
         # self.timer = self.create_timer(1, self.play)
 
     def play(self, msg):             # 夹取动作，张开爪子，弯曲机械臂，收紧爪子夹取，抬升机械臂
-        action = int(msg.data)
-        self.send_claw_trajectory([0.6, -0.6])      # 张开
-        if action == 1:
-            time.sleep(1)
-            self.send_arm_trajectory([0.0, 0.0, 1.57, 0.0, 0.0, 0.0])
-            time.sleep(2)
-            self.send_claw_trajectory([-0.25, 0.25])
-            time.sleep(2)
-            self.send_arm_trajectory([0.0, 0.0, 0.3, 0.0, 0.0, 0.0])
-            time.sleep(2)
-            print('抓取完成')
-        else:
-            self.send_arm_trajectory([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-            time.sleep(2)
-            print('放开物体')
-        self.publisher_nav.publish(String(data=str(1)))
+        self.send_claw_trajectory([0.6, -0.6])
+        time.sleep(1)
+        self.send_arm_trajectory([0.0, 0.0, 1.57, 0.0, 0.0, 0.0])
+        time.sleep(2)
+        self.send_claw_trajectory([-0.2, 0.2])
+        time.sleep(2)
+        self.send_arm_trajectory([0.0, 0.0, 1.0, 0.0, 0.0, 0.0])
 
     def send_arm_trajectory(self, target_point):        # 发布消息控制机械臂
         # 创建JointTrajectory消息

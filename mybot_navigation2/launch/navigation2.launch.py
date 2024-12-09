@@ -1,9 +1,3 @@
-'''
-作者: 小鱼
-公众号: 鱼香ROS
-QQ交流群: 2642868461
-描述: Nav2 launch启动文件
-'''
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -34,12 +28,12 @@ def generate_launch_description():
                 'use_sim_time': use_sim_time,
                 'params_file': nav2_param_path}.items(),
         )
-    rviz_node =  Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2',
-            arguments=['-d', rviz_config_dir],
-            parameters=[{'use_sim_time': use_sim_time}],
-            output='screen')
+#     rviz_node =  Node(
+#             package='rviz2',
+#             executable='rviz2',
+#             name='rviz2',
+#             arguments=['-d', rviz_config_dir],
+#             parameters=[{'use_sim_time': use_sim_time}],
+#             output='screen')
     
-    return LaunchDescription([nav2_bringup_launch, rviz_node])
+    return LaunchDescription([nav2_bringup_launch])

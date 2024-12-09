@@ -486,7 +486,7 @@
             <wheel_diameter>0.065</wheel_diameter>
             <!-- limits -->
             <max_wheel_torque>20</max_wheel_torque>
-            <max_wheel_acceleration>5.0</max_wheel_acceleration>
+            <max_wheel_acceleration>1.0</max_wheel_acceleration>
             <!-- output -->
             <publish_odom>true</publish_odom>
             <publish_odom_tf>true</publish_odom_tf>
@@ -567,25 +567,25 @@
                     <x>
                         <noise type="gaussian">
                             <mean>0.0</mean>
-                            <stddev>1.7e-3</stddev>
-                            <bias_mean>0.000001</bias_mean>
-                            <bias_stddev>0.0000001</bias_stddev>
+                            <stddev>1.7e-2</stddev>
+                            <bias_mean>0.1</bias_mean>
+                            <bias_stddev>0.001</bias_stddev>
                         </noise>
                     </x>
                     <y>
                         <noise type="gaussian">
                             <mean>0.0</mean>
-                            <stddev>1.7e-3</stddev>
-                            <bias_mean>0.000001</bias_mean>
-                            <bias_stddev>0.0000001</bias_stddev>
+                            <stddev>1.7e-2</stddev>
+                            <bias_mean>0.1</bias_mean>
+                            <bias_stddev>0.001</bias_stddev>
                         </noise>
                     </y>
                     <z>
                         <noise type="gaussian">
                             <mean>0.0</mean>
-                            <stddev>1.7e-3</stddev>
-                            <bias_mean>0.000001</bias_mean>
-                            <bias_stddev>0.0000001</bias_stddev>
+                            <stddev>1.7e-2</stddev>
+                            <bias_mean>0.1</bias_mean>
+                            <bias_stddev>0.001</bias_stddev>
                         </noise>
                     </z>
                 </linear_acceleration>
@@ -597,8 +597,8 @@
     <gazebo reference="laser_link">
         <sensor name="laser_sensor" type="ray">
             <always_on>true</always_on>
-            <visualize>false</visualize>
-            <update_rate>10</update_rate>
+            <visualize>true</visualize>
+            <update_rate>20</update_rate>
             <pose>0 0 0.075 0 0 0</pose>
             <ray>
                 <scan>
@@ -611,13 +611,13 @@
                 </scan>
                 <range>
                     <min>0.20000</min>
-                    <max>6</max>
+                    <max>10</max>
                     <resolution>0.015000</resolution>
                 </range>
                 <noise>
                     <type>gaussian</type>
                     <mean>0.0</mean>
-                    <stddev>0.0001</stddev>
+                    <stddev>0.01</stddev>
                 </noise>
             </ray>
             <plugin name="laserscan" filename="libgazebo_ros_ray_sensor.so">

@@ -1,54 +1,62 @@
+#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
-from std_msgs.msg import String
+# 1.导入消息类型JointState
+from sensor_msgs.msg import JointState
 
-class VelocityController(Node):
-    def __init__(self):
-        super().__init__('velocity_controller')
-        self.target_subscription = self.create_subscription(
-            String,
-            '/wheel_control',                  # 订阅语言节点的指令
-            self.command_callback,
-            10
-        )
-        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
-        self.timer = self.create_timer(0.1, self.timer_callback)  # 每0.1秒调用一次
-        self.vel_msg = Twist()
+import threading
+import time
 
-        # 设置初始速度
-        self.set_velocity(0.0, 0.0)  # 线速度和角速度
+class RotateWheelNode(Node):
+    def __init__(self,name):
+        super().__init__(name)
+        self.get_logger().info(f"node {name} init..")
+        # 创建并初始化发布者成员属性pub_joint_states_
+        self.joint_states_publisher_ = self.create_publisher(JointState,"joint_states", 10) 
+        # 初始化数据
+        self._init_joint_states()
+        self.pub_rate = self.create_rate(30)
+        self.thread_ = threading.Thread(target=self._thread_pub)
+        self.thread_.start()
 
-    def command_callback(self, msg):
-        if msg.data == '0':         # 停止
-            self.set_velocity(0.0, 0.0)
-            self.get_logger().info(f"停止运动")
-        elif msg.data == '1':       # 转动
-            self.set_velocity(0.0, 0.2)
-            self.get_logger().info(f"开始校准角度")
-        elif msg.data == '2':       # 移动
-            self.set_velocity(0.02, 0.0)
-            self.get_logger().info(f"开始校准距离")
+    
+    def _init_joint_states(self):
+        # 初始左右轮子的速度
+        self.joint_speeds = [0.0,0.0]
+        self.joint_states = JointState()
+        self.joint_states.header.stamp = self.get_clock().now().to_msg()
+        self.joint_states.header.frame_id = ""
+        # 关节名称
+        self.joint_states.name = ['left_wheel_joint','right_wheel_joint']
+        # 关节的位置
+        self.joint_states.position = [0.0,0.0]
+        # 关节速度
+        self.joint_states.velocity = self.joint_speeds
+        # 力 
+        self.joint_states.effort = []
 
-    def set_velocity(self, linear, angular):
-        """设置线速度和角速度"""
-        self.vel_msg.linear.x = linear
-        self.vel_msg.angular.z = angular
+    def update_speed(self,speeds):
+        self.joint_speeds = speeds
 
-    def timer_callback(self):
-        """发布速度消息"""
-        self.publisher_.publish(self.vel_msg)
+    def _thread_pub(self):
+        last_update_time = time.time()
+        while rclpy.ok():
+            delta_time =  time.time()-last_update_time
+            last_update_time = time.time()
+            # 更新位置
+            self.joint_states.position[0]  += delta_time*self.joint_states.velocity[0]
+            self.joint_states.position[1]  += delta_time*self.joint_states.velocity[1]
+            # 更新速度
+            self.joint_states.velocity = self.joint_speeds
+            # 更新 header
+            self.joint_states.header.stamp = self.get_clock().now().to_msg()
+            # 发布关节数据
+            self.joint_states_publisher_.publish(self.joint_states)
+            self.pub_rate.sleep()
 
 def main(args=None):
-    rclpy.init(args=args)
-    controller = VelocityController()
-    try:
-        rclpy.spin(controller)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        controller.destroy_node()
-        rclpy.shutdown()
-
-if __name__ == '__main__':
-    main()
+    rclpy.init(args=args) # 初始化rclpy
+    node = RotateWheelNode("rotate_mybot_wheel")  # 新建一个节点
+    node.update_speed([15.0,-15.0])
+    rclpy.spin(node) # 保持节点运行，检测是否收到退出指令（Ctrl+C）
+    rclpy.shutdown() # 关闭rclpy

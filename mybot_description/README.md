@@ -1,3 +1,4 @@
+- author：legendleo
 # 项目概览
 - config：机械臂使用moveit助手生成的配置文件，用于配合moveit对机械臂进行控制；
 - launch：启动文件
