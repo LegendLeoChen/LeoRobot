@@ -39,7 +39,7 @@ def input_listener():
 
 def classify(words):            # 文本输入大模型的API输出分类
     # 替换为你的实际访问令牌
-    access_token = "24.13efa3e374fb5e52a6f4dff4e16a9292.2592000.1730877592.282335-47368062"
+    access_token = ""
     url = f"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token={access_token}"
     # 定义要发送的消息
     payload = json.dumps({
@@ -226,8 +226,8 @@ class AudioClassifyNode(Node):
 
 
 audio_file = "output.wav"  # 输出音频文件名
-wsParam = Ws_Param(APPID='ef46b631', APISecret='MzAyNjNkZjQzMzEzMzA5ZWJmY2MyNTU5',
-                APIKey='6c9dfd47a44d8b548b74cfbc83bd6f81',
+wsParam = Ws_Param(APPID='your appid', APISecret='your apisecret',
+                APIKey='your apikey',
                 AudioFile=audio_file)
 
 def main():
